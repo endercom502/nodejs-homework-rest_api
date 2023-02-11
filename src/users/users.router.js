@@ -1,6 +1,5 @@
 const express = require("express");
 const usersController = require("./users.controllers.js");
-const { imageParser, upload } = require("../imageParser/imageParser");
 const router = express.Router();
 
 router.post(
