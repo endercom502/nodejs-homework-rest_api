@@ -7,7 +7,7 @@ dotenv.config();
 const contactsRouter = require("./src/contacts/contacts.router.js");
 const usersRouter = require("./src/users/users.router.js");
 
-const app = express();
+const app = express();;
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(express.static("public"));
