@@ -8,12 +8,6 @@ const { UnauthorizedError } = require("../errorHandler/errorHandler");
 class UsersController {
   constructor() {
     this._costFactor = 4;
-  }
-
-  get userRegistration() {
-    return this._userRegistration.bind(this);
-  }
-
   get userLogIn() {
     return this._userLogIn.bind(this);
   }

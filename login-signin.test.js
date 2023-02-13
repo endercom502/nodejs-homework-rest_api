@@ -41,9 +41,3 @@ describe("Unit suitcase Example", () => {
     expect(res.body.user.email).toEqual(email);
   });
 });
-Footer
-© 2023 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security

@@ -28,11 +28,6 @@ async function findByEmail(email) {
 }
 
 async function updateToken(id, newToken) {
-  return this.findByIdAndUpdate(
-    id,
-    { $set: { token: newToken } },
-    { new: true }
-  );
 }
 
 const usersModel = mongoose.model("User", userSchema);
