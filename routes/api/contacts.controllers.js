@@ -1,3 +1,86 @@
+const {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+  updateContact,
+} = require("../../models/contacts.js");
+
+const Joi = require("joi");
+
+class ContactControllers {
+  async getAllContacts(req, res) {
+    const contacts = await listContacts();
+    return res.status(200).json(contacts).send();
+  }
+
+  async getContact(req, res) {
+    const contact = await getContactById(req.params.contactId);
+    if (!contact) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    return res.status(200).json(contact).send();
+  }
+
+  async removeContactById(req, res, next) {
+    removeContact(req.params.contactId);
+    return res.status(200).json({ message: "contact deleted" }).send();
+  }
+
+  async addNewContact(req, res, next) {
+    addContact(req.body);
+    return res.status(201).send({ message: "contact added" });
+  }
+
+  async validateAddContact(req, res, next) {
+    const validationSchema = Joi.object({
+      name: Joi.string().required(),
+      email: Joi.string().email().required(),
+      phone: Joi.string().required(),
+    });
+
+    const contactData = req.body;
+    const result = validationSchema.validate(contactData);
+
+    if (result?.error) {
+      return res
+        .status(400)
+        .json({
+          message: result.error.details[0].message,
+        })
+        .send();
+    }
+
+    next();
+  }
+
+  async updateContactById(req, res, next) {
+    updateContact(req.params.contactId, req.body);
+    return res.status(200).json({ message: "contact updated" }).send();
+  }
+
+  async validateUpdateContactById(req, res, next) {
+    const validationSchema = Joi.object({
+      name: Joi.string(),
+      email: Joi.string().email(),
+      phone: Joi.string(),
+    });
+
+    const contactData = req.body;
+    const result = validationSchema.validate(contactData);
+
+    if (result?.error) {
+      return res.status(400).json({ message: "missing fields" }).send();
+    }
+
+    next();
+  }
+}
+
+const contactControllers = new ContactControllers();
+
+module.exports = contactControllers;
 const Joi = require("joi");
 const contactModel = require("./contacts.model");
 const { ObjectId } = require("mongodb");
@@ -5,25 +88,7 @@ const { ObjectId } = require("mongodb");
 class ContactControllers {
   async getAllContacts(req, res, next) {
     try {
-      const { page, limit, favorite } = req.query;
-
-      const actualLimit = limit ? limit : 20;
-      const pageNumber = page
-        ? (page - 1) * actualLimit
-        : (1 - 1) * actualLimit;
-
-      let contacts = [];
-
-      if (favorite) {
-        contacts = await contactModel.find({
-          favorite: favorite,
-        });
-      } else {
-        contacts = await contactModel
-          .find()
-          .limit(actualLimit)
-          .skip(pageNumber);
-      }
+      const contacts = await contactModel.find();
       return res.status(200).json(contacts).send();
     } catch (error) {
       next(error);
@@ -82,7 +147,7 @@ class ContactControllers {
     try {
       const requestBody = req.body;
       const newBody = { ...requestBody, favorite: false };
-      const contact = await contactModel.create(newBody);
+      const contact = await contactModel.create(newBody); // - function for creation an element in Mongodb with validation
 
       return res
         .status(201)
